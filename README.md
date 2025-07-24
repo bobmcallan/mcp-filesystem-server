@@ -93,14 +93,39 @@ This MCP server provides secure access to the local filesystem via the Model Con
 go install github.com/bobmcallan/mcp-filesystem-server@latest
 ```
 
+### Configuration
+
+Create a `config.toml` file in the same directory as the executable:
+
+```toml
+# MCP Filesystem Server Configuration
+
+[directories]
+# List of directories that the server is allowed to access
+allowed = [
+    "/path/to/allowed/directory",
+    "/another/allowed/directory"
+]
+
+[logging]
+# Log level: debug, info, warn, error
+level = "info"
+# Log format: json, text
+format = "json"
+# Log output: file, stderr  
+output = "file"
+# Log file path (relative to executable directory)
+file_path = "mcp-filesystem-server.log"
+```
+
 ### Usage
 
 #### As a standalone server
 
-Start the MCP server with allowed directories:
+Start the MCP server (directories are configured in config.toml):
 
 ```bash
-mcp-filesystem-server /path/to/allowed/directory [/another/allowed/directory ...]
+mcp-filesystem-server
 ```
 
 #### As a library in your Go project
@@ -139,11 +164,13 @@ To integrate this server with apps that support MCP:
   "mcpServers": {
     "filesystem": {
       "command": "mcp-filesystem-server",
-      "args": ["/path/to/allowed/directory", "/another/allowed/directory"]
+      "args": []
     }
   }
 }
 ```
+
+Note: Allowed directories are now configured in `config.toml` instead of command line arguments.
 
 ### Usage with Warp Terminal
 
@@ -154,7 +181,7 @@ For Warp terminal integration, use the provided configuration:
   "mcpServers": {
     "filesystem": {
       "command": "mcp-filesystem-server",
-      "args": ["."],
+      "args": [],
       "env": {},
       "description": "Secure filesystem operations via MCP"
     }
@@ -162,16 +189,16 @@ For Warp terminal integration, use the provided configuration:
 }
 ```
 
-This configuration allows Warp to use the filesystem server for secure file operations within the current directory.
+This configuration allows Warp to use the filesystem server for secure file operations. Configure allowed directories in `config.toml`.
 
 ### Docker
 
 #### Running with Docker
 
-You can run the Filesystem MCP server using Docker:
+You can run the Filesystem MCP server using Docker (mount config.toml):
 
 ```bash
-docker run -i --rm ghcr.io/bobmcallan/mcp-filesystem-server:latest /path/to/allowed/directory
+docker run -i --rm -v /path/to/config.toml:/app/config.toml ghcr.io/bobmcallan/mcp-filesystem-server:latest
 ```
 
 #### Docker Configuration with MCP
@@ -187,33 +214,16 @@ To integrate the Docker image with apps that support MCP:
         "run",
         "-i",
         "--rm",
-        "ghcr.io/bobmcallan/mcp-filesystem-server:latest",
-        "/path/to/allowed/directory"
+        "-v", "/path/to/config.toml:/app/config.toml",
+        "-v", "/host/directory:/container/directory",
+        "ghcr.io/bobmcallan/mcp-filesystem-server:latest"
       ]
     }
   }
 }
 ```
 
-If you need changes made inside the container to reflect on the host filesystem, you can mount a volume. This allows the container to access and modify files on the host system. Here's an example:
-
-```json
-{
-  "mcpServers": {
-    "filesystem": {
-      "command": "docker",
-      "args": [
-        "run",
-        "-i",
-        "--rm",
-        "--volume=/allowed/directory/in/host:/allowed/directory/in/container",
-        "ghcr.io/bobmcallan/mcp-filesystem-server:latest",
-        "/allowed/directory/in/container"
-      ]
-    }
-  }
-}
-```
+Note: Mount your `config.toml` file and any directories you want to access inside the container.
 
 ## License
 

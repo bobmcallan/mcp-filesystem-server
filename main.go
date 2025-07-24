@@ -1,58 +1,74 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"io"
 	"log/slog"
 	"os"
 	"path/filepath"
-	"strings"
 
+	"github.com/BurntSushi/toml"
 	"github.com/bobmcallan/mcp-filesystem-server/filesystemserver"
 	"github.com/mark3labs/mcp-go/server"
 )
 
 // LogConfig represents logging configuration
 type LogConfig struct {
-	Level    string `json:"level"`
-	Format   string `json:"format"`
-	Output   string `json:"output"`
-	FilePath string `json:"file_path"`
+	Level    string `toml:"level"`
+	Format   string `toml:"format"`
+	Output   string `toml:"output"`
+	FilePath string `toml:"file_path"`
+}
+
+// DirectoriesConfig represents directories configuration
+type DirectoriesConfig struct {
+	Allowed []string `toml:"allowed"`
 }
 
 // Config represents the application configuration
 type Config struct {
-	Logging LogConfig `json:"logging"`
+	Directories DirectoriesConfig `toml:"directories"`
+	Logging     LogConfig         `toml:"logging"`
 }
 
-func setupLogger() *slog.Logger {
+func loadConfig() (Config, error) {
+	// Get the directory of the executable
+	execPath, err := os.Executable()
+	if err != nil {
+		return Config{}, fmt.Errorf("failed to get executable path: %w", err)
+	}
+
+	execDir := filepath.Dir(execPath)
+	configPath := filepath.Join(execDir, "config.toml")
+
+	// Try to read and parse TOML config file
+	var config Config
+	if _, err := toml.DecodeFile(configPath, &config); err != nil {
+		// Return default configuration if config file doesn't exist or can't be parsed
+		config = Config{
+			Directories: DirectoriesConfig{
+				Allowed: []string{"."},
+			},
+			Logging: LogConfig{
+				Level:    "info",
+				Format:   "json",
+				Output:   "file",
+				FilePath: "mcp-filesystem-server.log",
+			},
+		}
+	}
+
+	return config, nil
+}
+
+func setupLogger(config Config) *slog.Logger {
 	// Get the directory of the executable
 	execPath, err := os.Executable()
 	if err != nil {
 		// Fallback to disabled logging if we can't determine executable path
 		return slog.New(slog.NewJSONHandler(io.Discard, nil))
 	}
-
 	execDir := filepath.Dir(execPath)
-	configPath := filepath.Join(execDir, "config.json")
-
-	// Try to read config file
-	var config Config
-	if configData, err := os.ReadFile(configPath); err == nil {
-		if err := json.Unmarshal(configData, &config); err != nil {
-			// If config parsing fails, disable logging to avoid stderr interference
-			return slog.New(slog.NewJSONHandler(io.Discard, nil))
-		}
-	} else {
-		// Default configuration if config file doesn't exist
-		config.Logging = LogConfig{
-			Level:    "info",
-			Format:   "json",
-			Output:   "stderr",
-			FilePath: "mcp-filesystem-server.log",
-		}
-	}
 
 	// Parse log level
 	var logLevel slog.Level
@@ -110,31 +126,30 @@ func setupLogger() *slog.Logger {
 }
 
 func main() {
+	// Load configuration from config.toml
+	config, err := loadConfig()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Failed to load configuration: %v\n", err)
+		os.Exit(1)
+	}
+
 	// Initialize structured logger with file logging support
-	logger := setupLogger()
+	logger := setupLogger(config)
 	
 	// Log startup message
 	logger.Info("MCP Filesystem Server starting", "version", "dev", "pid", os.Getpid())
 
-	// Parse command line arguments
-	if len(os.Args) < 2 {
-		// Log usage to logger instead of stderr to avoid MCP protocol interference
-		logger.Error("Invalid usage", "usage", fmt.Sprintf("%s <allowed-directory> [additional-directories...]", os.Args[0]))
+	// Validate that we have allowed directories from config
+	if len(config.Directories.Allowed) == 0 {
+		logger.Error("No allowed directories configured in config.toml")
 		os.Exit(1)
 	}
 
-	// Validate that arguments are actual directories, not flags
-	var validDirs []string
-	for _, arg := range os.Args[1:] {
-		if strings.HasPrefix(arg, "-") {
-			logger.Error("Invalid argument - flags not supported", "arg", arg, "usage", fmt.Sprintf("%s <allowed-directory> [additional-directories...]", os.Args[0]))
-			os.Exit(1)
-		}
-		validDirs = append(validDirs, arg)
-	}
+	// Log configured directories
+	logger.Info("Configured allowed directories", "directories", config.Directories.Allowed)
 
 	// Create and start the server
-	fss, err := filesystemserver.NewFilesystemServer(validDirs)
+	fss, err := filesystemserver.NewFilesystemServer(config.Directories.Allowed)
 	if err != nil {
 		logger.Error("Failed to create server", "error", err)
 		os.Exit(1)

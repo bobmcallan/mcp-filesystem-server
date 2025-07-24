@@ -1,0 +1,25 @@
+# MCP Filesystem Server Configuration
+
+[directories]
+# List of directories that the server is allowed to access
+allowed = [
+    "C:\\development",
+    "C:\\Users\\%USERNAME%\\Documents"
+]
+
+# Multiple logging configurations - each [[logging]] section creates a separate output
+[[logging]]
+# Log level: trace, debug, info, warn, error, fatal, panic
+level = "info"
+# Log format: console, json
+format = "json"
+# Log output: file, stdio, stderr
+output = "file"
+# Log file path (relative to executable directory, only used for file output)
+file_path = "mcp-filesystem-server.log"
+
+[[logging]]
+# Additional console logging for development
+level = "debug"
+format = "console"
+output = "stdio"

@@ -1,8 +1,0 @@
-{
-  "logging": {
-    "level": "info",
-    "format": "json",
-    "output": "file",
-    "file_path": "mcp-filesystem-server.log"
-  }
-}
