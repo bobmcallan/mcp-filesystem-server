@@ -90,7 +90,7 @@ This MCP server provides secure access to the local filesystem via the Model Con
 #### Using Go Install
 
 ```bash
-go install github.com/mark3labs/mcp-filesystem-server@latest
+go install github.com/bobmcallan/mcp-filesystem-server@latest
 ```
 
 ### Usage
@@ -112,7 +112,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/mark3labs/mcp-filesystem-server/filesystemserver"
+	"github.com/bobmcallan/mcp-filesystem-server/filesystemserver"
 )
 
 func main() {
@@ -145,6 +145,25 @@ To integrate this server with apps that support MCP:
 }
 ```
 
+### Usage with Warp Terminal
+
+For Warp terminal integration, use the provided configuration:
+
+```json
+{
+  "mcpServers": {
+    "filesystem": {
+      "command": "mcp-filesystem-server",
+      "args": ["."],
+      "env": {},
+      "description": "Secure filesystem operations via MCP"
+    }
+  }
+}
+```
+
+This configuration allows Warp to use the filesystem server for secure file operations within the current directory.
+
 ### Docker
 
 #### Running with Docker
@@ -152,7 +171,7 @@ To integrate this server with apps that support MCP:
 You can run the Filesystem MCP server using Docker:
 
 ```bash
-docker run -i --rm ghcr.io/mark3labs/mcp-filesystem-server:latest /path/to/allowed/directory
+docker run -i --rm ghcr.io/bobmcallan/mcp-filesystem-server:latest /path/to/allowed/directory
 ```
 
 #### Docker Configuration with MCP
@@ -168,7 +187,7 @@ To integrate the Docker image with apps that support MCP:
         "run",
         "-i",
         "--rm",
-        "ghcr.io/mark3labs/mcp-filesystem-server:latest",
+        "ghcr.io/bobmcallan/mcp-filesystem-server:latest",
         "/path/to/allowed/directory"
       ]
     }
@@ -188,7 +207,7 @@ If you need changes made inside the container to reflect on the host filesystem,
         "-i",
         "--rm",
         "--volume=/allowed/directory/in/host:/allowed/directory/in/container",
-        "ghcr.io/mark3labs/mcp-filesystem-server:latest",
+        "ghcr.io/bobmcallan/mcp-filesystem-server:latest",
         "/allowed/directory/in/container"
       ]
     }

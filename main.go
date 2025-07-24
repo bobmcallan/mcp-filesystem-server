@@ -2,14 +2,17 @@ package main
 
 import (
 	"fmt"
-	"log"
+	"log/slog"
 	"os"
 
-	"github.com/mark3labs/mcp-filesystem-server/filesystemserver"
+	"github.com/bobmcallan/mcp-filesystem-server/filesystemserver"
 	"github.com/mark3labs/mcp-go/server"
 )
 
 func main() {
+	// Initialize structured logger
+	logger := slog.New(slog.NewJSONHandler(os.Stderr, nil))
+
 	// Parse command line arguments
 	if len(os.Args) < 2 {
 		fmt.Fprintf(
@@ -23,11 +26,13 @@ func main() {
 	// Create and start the server
 	fss, err := filesystemserver.NewFilesystemServer(os.Args[1:])
 	if err != nil {
-		log.Fatalf("Failed to create server: %v", err)
+		logger.Error("Failed to create server", "error", err)
+		os.Exit(1)
 	}
 
 	// Serve requests
 	if err := server.ServeStdio(fss); err != nil {
-		log.Fatalf("Server error: %v", err)
+		logger.Error("Server error", "error", err)
+		os.Exit(1)
 	}
 }
