@@ -1,28 +1,31 @@
 {
+  "logging": {
+    "format": "json",
+    "file_path": "mcp-filesystem-server.log",
+    "level": "info",
+    "output": "file"
+  },
   "server": {
-    "name": "mcp-filesystem-server",
     "version": "dev",
+    "name": "mcp-filesystem-server",
     "description": "Secure filesystem operations via Model Context Protocol"
   },
   "security": {
-    "allowed_directories": ["."],
-    "max_file_size": 10485760,
     "max_files_per_request": 50,
     "validate_paths": true,
+    "max_file_size": 10485760,
+    "allowed_directories": [
+      "."
+    ],
     "follow_symlinks": false
-  },
-  "logging": {
-    "level": "info",
-    "format": "json",
-    "output": "stderr"
   },
   "mcp": {
     "protocol_version": "2024-11-05",
     "capabilities": {
       "resources": true,
-      "tools": true,
+      "sampling": false,
       "prompts": false,
-      "sampling": false
+      "tools": true
     }
   }
 }

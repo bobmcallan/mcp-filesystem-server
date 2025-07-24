@@ -1,11 +1,8 @@
 {
-  "filesystem": {
-    "command": "C:\\development\\mcp-filesystem-server\\bin\\mcp-filesystem-server.exe",
-    "args": [
-      "C:\\development"
-    ],
-    "env": {},
-    "working_directory": null,
-    "start_on_launch": true
+  "logging": {
+    "level": "info",
+    "format": "json",
+    "output": "file",
+    "file_path": "mcp-filesystem-server.log"
   }
 }
