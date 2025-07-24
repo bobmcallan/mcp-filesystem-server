@@ -1,4 +1,9 @@
 # Filesystem MCP Server Configuration
+[app]
+name = "Filesystem-MCP"
+version = "1.0.0"
+console_output = true
+file_output = true
 
 [directories]
 # List of directories that the server is allowed to access

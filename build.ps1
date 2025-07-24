@@ -58,39 +58,62 @@ try {
     $binConfigPath = "$path/config.toml"
     $srcConfigPath = "./config.toml"
     
-    Write-Host "Creating/updating bin/config.toml with version $fullVersion"
+    Write-Host "Updating bin/config.toml [app] section with version $fullVersion"
     
-    # Read source config to extract sections
-    $srcContent = Get-Content $srcConfigPath -Raw
-    
-    # Parse TOML to extract values
-    $appName = "Filesystem MCP Server"  # Default name
-    
-    # Extract directories section from source
-    $directoriesSection = ""
-    if ($srcContent -match '(?ms)\[directories\](.*?)(?=\[|$)') {
-        $directoriesSection = "[directories]" + $matches[1].TrimEnd()
-    }
-    
-    # Extract logging sections from source  
-    $loggingSections = ""
-    $matches = [regex]::Matches($srcContent, '(?ms)\[\[logging\]\](.*?)(?=\[\[|\[(?!\[)|$)')
-    foreach ($match in $matches) {
-        $loggingSections += "[[logging]]" + $match.Groups[1].Value.TrimEnd() + "`n`n"
-    }
-    
-    # Create new config content with app section
-    $newConfigContent = @"
-# Filesystem MCP Server Configuration
-# Version: $fullVersion
+    # Check if bin/config.toml exists
+    if (Test-Path $binConfigPath) {
+        # Read existing bin config
+        $binContent = Get-Content $binConfigPath -Raw
+        
+        # Check if [app] section exists and update only the version
+        if ($binContent -match '(?ms)(\[app\][^\[]*)') {
+            # Update existing [app] section, only changing the version
+            $appSection = $matches[1]
+            $updatedAppSection = $appSection -replace 'version\s*=\s*"[^"]*"', "version = `"$fullVersion`""
+            $binContent = $binContent -replace '(?ms)\[app\][^\[]*', $updatedAppSection
+        } else {
+            # Add [app] section at the beginning after the comment
+            $appSection = @"
+[app]
+name = "Filesystem-MCP"
+version = "$fullVersion"
 
-$directoriesSection
-
-$loggingSections
 "@
+            if ($binContent -match '^(#[^\r\n]*(?:\r?\n)*)(.*)$') {
+                $comment = $matches[1]
+                $rest = $matches[2]
+                $binContent = $comment + $appSection + $rest
+            } else {
+                $binContent = $appSection + $binContent
+            }
+        }
+        
+        Set-Content -Path $binConfigPath -Value $binContent -NoNewline
+    } else {
+        # Copy source config and add [app] section
+        Copy-Item $srcConfigPath $binConfigPath
+        $binContent = Get-Content $binConfigPath -Raw
+        
+        $appSection = @"
+[app]
+name = "Filesystem-MCP"
+version = "$fullVersion"
+
+"@
+        
+        # Add [app] section at the beginning after the comment
+        if ($binContent -match '^(#[^\r\n]*(?:\r?\n)*)(.*)$') {
+            $comment = $matches[1]
+            $rest = $matches[2]
+            $binContent = $comment + $appSection + $rest
+        } else {
+            $binContent = $appSection + $binContent
+        }
+        
+        Set-Content -Path $binConfigPath -Value $binContent -NoNewline
+    }
     
-    Set-Content -Path $binConfigPath -Value $newConfigContent -NoNewline
-    Write-Host "Updated bin/config.toml with version '$fullVersion'"
+    Write-Host "Updated bin/config.toml [app] section with version '$fullVersion'"
 
     $currentlocation = $(get-location)
     $invokelocation = (Split-Path $MyInvocation.MyCommand.Path)
