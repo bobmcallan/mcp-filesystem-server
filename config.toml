@@ -1,4 +1,4 @@
-# Custos MCP Filesystem Server Configuration
+# Filesystem MCP Server Configuration
 
 [directories]
 # List of directories that the server is allowed to access

@@ -14,10 +14,10 @@ param (
 
 <#
 .SYNOPSIS
-    Build script for Custos MCP Filesystem Server
+    Build script for Filesystem MCP Server
 
 .DESCRIPTION
-    This script builds the Custos MCP Filesystem Server application with secure filesystem capabilities.
+    This script builds the Filesystem MCP Server application with secure filesystem capabilities.
 
 .PARAMETER UpdatePackages
     Update all Go packages to their latest versions before building
@@ -34,7 +34,7 @@ param (
 Push-Location (Split-Path $MyInvocation.MyCommand.Path)
 
 try {
-    Write-Host "Building Custos MCP Filesystem Server" -ForegroundColor Cyan
+    Write-Host "Building Filesystem MCP Server" -ForegroundColor Cyan
 
     $path = Join-Path -Path $PSScriptRoot -ChildPath 'bin'
 
@@ -64,7 +64,7 @@ try {
     $srcContent = Get-Content $srcConfigPath -Raw
     
     # Parse TOML to extract values
-    $appName = "Custos MCP Filesystem Server"  # Default name
+    $appName = "Filesystem MCP Server"  # Default name
     
     # Extract directories section from source
     $directoriesSection = ""
@@ -81,7 +81,7 @@ try {
     
     # Create new config content with app section
     $newConfigContent = @"
-# Custos MCP Filesystem Server Configuration
+# Filesystem MCP Server Configuration
 # Version: $fullVersion
 
 $directoriesSection
@@ -200,25 +200,25 @@ $loggingSections
         Write-Host "No test files found, skipping tests" -ForegroundColor Gray
     }
 
-    $output = Join-Path -Path $path -ChildPath "custos-mcp.exe"
+    $output = Join-Path -Path $path -ChildPath "filesystem-mcp.exe"
     Write-Host "Output path: $output"
     
     # Stop executing process if it's running
     try {
-        $process = Get-Process -Name "custos-mcp" -ErrorAction SilentlyContinue
+        $process = Get-Process -Name "filesystem-mcp" -ErrorAction SilentlyContinue
         if ($process) {
-            Write-Host "Stopping existing custos-mcp process..." -ForegroundColor Yellow
-            Stop-Process -Name "custos-mcp" -Force
+            Write-Host "Stopping existing filesystem-mcp process..." -ForegroundColor Yellow
+            Stop-Process -Name "filesystem-mcp" -Force
             Write-Host "Process stopped successfully" -ForegroundColor Green
         } else {
-            Write-Host "No custos-mcp process found running" -ForegroundColor Gray
+            Write-Host "No filesystem-mcp process found running" -ForegroundColor Gray
         }
     }
     catch {
-        Write-Warning "Could not stop custos-mcp process: $($_.Exception.Message)"
+        Write-Warning "Could not stop filesystem-mcp process: $($_.Exception.Message)"
     }
     
-    Write-Host "Building custos-mcp version $fullVersion..." -ForegroundColor Yellow
+    Write-Host "Building filesystem-mcp version $fullVersion..." -ForegroundColor Yellow
     
     # Build the MCP server with version info
     go build -ldflags "-X main.Version=$fullVersion" -o $output .

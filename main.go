@@ -156,7 +156,7 @@ func showSplashScreen(config Config) {
 	)
 
 	// Create colored ASCII art banner using go-figure with built-in color support
-	appName := "CUSTOS FILESYSTEM"
+	appName := "FILESYSTEM"
 	appNameFigure := figure.NewColorFigure(appName, "banner", "blue", true)
 	appSeparator := "===================================================================================================="
 
@@ -168,7 +168,7 @@ func showSplashScreen(config Config) {
 	fmt.Println(ColorDarkBlue + appSeparator + ColorReset)
 	fmt.Println()
 	fmt.Printf(ColorGreen + "Version: 1.0.0.07241752\n\n" + ColorReset)
-	fmt.Println(ColorGreen + "» Secure Filesystem MCP Server «" + ColorReset)
+	fmt.Println(ColorGreen + "» Filesystem MCP Server «" + ColorReset)
 	fmt.Println()
 	fmt.Println(ColorGreen + "Configuration:" + ColorReset)
 	fmt.Printf(ColorGreen+"» Log Level:          %s\n"+ColorReset, config.Logging.Level)
