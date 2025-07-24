@@ -7,6 +7,7 @@ import (
 	"log/slog"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/bobmcallan/mcp-filesystem-server/filesystemserver"
 	"github.com/mark3labs/mcp-go/server"
@@ -122,8 +123,18 @@ func main() {
 		os.Exit(1)
 	}
 
+	// Validate that arguments are actual directories, not flags
+	var validDirs []string
+	for _, arg := range os.Args[1:] {
+		if strings.HasPrefix(arg, "-") {
+			logger.Error("Invalid argument - flags not supported", "arg", arg, "usage", fmt.Sprintf("%s <allowed-directory> [additional-directories...]", os.Args[0]))
+			os.Exit(1)
+		}
+		validDirs = append(validDirs, arg)
+	}
+
 	// Create and start the server
-	fss, err := filesystemserver.NewFilesystemServer(os.Args[1:])
+	fss, err := filesystemserver.NewFilesystemServer(validDirs)
 	if err != nil {
 		logger.Error("Failed to create server", "error", err)
 		os.Exit(1)

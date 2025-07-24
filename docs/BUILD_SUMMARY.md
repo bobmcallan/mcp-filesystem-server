@@ -3,7 +3,7 @@
 ## ✅ Task Completion Summary
 
 ### 1. **PowerShell Build Script Created** ✅
-- **Location**: `build.ps1`
+- **Location**: `scripts/build.ps1`
 - **Features**:
   - Clean build option (`-Clean`)
   - Version embedding (`-Version`)
@@ -48,7 +48,7 @@ bin/
 ├── mcp-filesystem-server.log   # Log file (created on first run)
 └── README.md                   # Binary distribution documentation
 
-build.ps1                       # PowerShell build script
+scripts/build.ps1               # PowerShell build script
 BUILD_SUMMARY.md               # This summary file
 ```
 
@@ -69,20 +69,20 @@ BUILD_SUMMARY.md               # This summary file
 ### Build Script Usage
 ```powershell
 # Basic build
-.\build.ps1
+.\scripts\build.ps1
 
 # Clean build with debug logging
-.\build.ps1 -Clean -LogLevel debug
+.\scripts\build.ps1 -Clean -LogLevel debug
 
 # Build with version
-.\build.ps1 -Version "1.0.0"
+.\scripts\build.ps1 -Version "1.0.0"
 ```
 
 ## 🧪 Testing
 
 ### Automated Tests Available
 - `.\bin\test-build.ps1` - Build validation
-- `.\test-warp-alignment.ps1` - WARP MCP compliance testing
+- `.\scripts\test-warp-alignment.ps1` - WARP MCP compliance testing
 
 ### Manual Testing Verified
 - ✅ Executable starts and responds to MCP protocol
@@ -102,7 +102,7 @@ The MCP Filesystem Server is now:
 5. **Ready** for WARP MCP server integration
 
 ### Next Steps
-1. Install as WARP MCP server: `.\install-warp.ps1`
+1. Install as WARP MCP server: `.\scripts\install-warp.ps1`
 2. Test integration in WARP terminal
 3. Monitor logs at `bin/mcp-filesystem-server.log`
 

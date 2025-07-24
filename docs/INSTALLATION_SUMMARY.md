@@ -7,8 +7,7 @@
 ### Built Components:
 - `bin/mcp-filesystem-server.exe` - Main server executable (7.7MB)
 - `bin/config.json` - Server configuration file
-- `bin/test.ps1` - Test suite script
-- `bin/run.ps1` - Convenience runner script
+- `bin/test-build.ps1` - Test suite script
 - `bin/README.md` - Binary distribution documentation
 
 ### Test Results:

@@ -2,7 +2,7 @@
   "mcpServers": {
     "filesystem": {
       "command": "C:\\development\\mcp-filesystem-server\\bin\\mcp-filesystem-server.exe",
-      "args": ["C:\\development"],
+      "args": ["C:\\\\development"],
       "env": {
         "LOG_LEVEL": "info"
       },
