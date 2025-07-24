@@ -1,11 +1,8 @@
-# MCP Filesystem Server Configuration
+# Custos MCP Filesystem Server Configuration
 
 [directories]
 # List of directories that the server is allowed to access
-allowed = [
-    "C:\\development",
-    "C:\\Users\\%USERNAME%\\Documents"
-]
+allowed = ["C:\\development", "C:\\Users\\%USERNAME%\\Documents"]
 
 # Multiple logging configurations - each [[logging]] section creates a separate output
 [[logging]]
